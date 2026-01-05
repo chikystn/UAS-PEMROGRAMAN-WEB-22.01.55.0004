@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UAS Toko Online Sutan - Kanky</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome untuk Icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .navbar {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .card-product {
+            transition: transform 0.2s;
+            border: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .card-product:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        /* Style tombol agar merah khas Kanky */
+        .btn-kanky {
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+        }
+        .btn-kanky:hover {
+            background-color: #b71c1c;
+            color: white;
+        }
+        /* Menyembunyikan halaman transaksi saat awal load */
+        #halaman-transaksi {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#" onclick="kembaliKeKatalog()">
+                <i class="fas fa-bolt me-2 text-danger"></i>SUTAN KANKY STORE
+            </a>
+        </div>
+    </nav>
+
+    <!-- HALAMAN KATALOG PRODUK -->
+    <div id="halaman-katalog" class="container mt-5 mb-5">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold text-uppercase">Lokal Pride Collection</h2>
+            <p class="text-muted">Sepatu Kanky Original - Kualitas Terbaik Anak Bangsa</p>
+        </div>
+
+        <div class="row" id="daftar-produk">
+            <!-- Produk akan dimasukkan otomatis oleh JavaScript -->
+        </div>
+    </div>
+
+    <!-- HALAMAN TRANSAKSI (Hidden by default) -->
+    <div id="halaman-transaksi" class="container mt-5 mb-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-header bg-danger text-white">
+                        <h4 class="mb-0"><i class="fas fa-shopping-cart me-2"></i>Form Pemesanan Kanky</h4>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row mb-4">
+                            <!-- Preview Produk yang Dibeli -->
+                            <div class="col-md-4 text-center">
+                                <img id="img-preview" src="" class="img-fluid rounded mb-2" style="max-height: 150px;">
+                                <h5 id="nama-preview" class="fw-bold"></h5>
+                                <p class="text-danger fw-bold fs-5" id="harga-preview"></p>
+                            </div>
+                            
+                            <!-- Form Input -->
+                            <div class="col-md-8">
+                                <form id="form-bayar" onsubmit="prosesBayar(event)">
+                                    <div class="mb-3">
+                                        <label class="form-label">Nama Lengkap</label>
+                                        <input type="text" class="form-control" id="nama_pembeli" required placeholder="Contoh: Sutan Cahaqiya">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Alamat Pengiriman</label>
+                                        <textarea class="form-control" id="alamat_pembeli" rows="2" required placeholder="Alamat lengkap..."></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Metode Pembayaran</label>
+                                        <select class="form-select" id="metode_bayar">
+                                            <option value="Transfer BCA">Transfer Bank BCA</option>
+                                            <option value="Transfer Mandiri">Transfer Bank Mandiri</option>
+                                            <option value="E-Wallet Dana">E-Wallet (Dana/OVO)</option>
+                                            <option value="COD">Bayar di Tempat (COD)</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <hr>
+                                    <div class="d-flex justify-content-between">
+                                        <button type="button" class="btn btn-outline-secondary" onclick="kembaliKeKatalog()">Batal</button>
+                                        <button type="submit" class="btn btn-kanky px-4">Bayar Sekarang</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-dark text-white text-center py-3 mt-auto">
+        <p class="mb-0">&copy; 2025 Sutan Kanky Store - UAS Web Penjualan</p>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // 1. DATA PRODUK KANKY (Simulasi Database)
+        const produkData = [
+            {
+                id: 1,
+                nama: "Kanky Story Honjo",
+                harga: 289000,
+                deskripsi: "Sneakers harian dengan desain klasik yang timeless. Nyaman dipakai seharian dengan insole empuk.",
+                gambar: "https://kankysport.com/cdn/shop/files/DSC00174.jpg?v=1719819779" // Gambar Kanky Putih/Klasik
+            },
+            {
+                id: 2,
+                nama: "Kanky Hiro Keio",
+                harga: 358000,
+                deskripsi: "Desain sporty futuristik dengan teknologi sole yang ringan. Cocok untuk lari ringan dan gaya casual.",
+                gambar: "https://kankysport.com/cdn/shop/files/HIROKEIOBLACKNATURAL_1.jpg?v=1706093153" // Gambar Kanky Sporty Hitam
+            },
+            {
+                id: 3,
+                nama: "Kanky Kitadake",
+                harga: 399000,
+                deskripsi: "Sepatu outdoor look yang tangguh namun tetap stylish. Material breathable mesh menjaga kaki tetap adem.",
+                gambar: "https://kankysport.com/cdn/shop/files/KITADAKEIVORYGREY_1.jpg?v=1706173041" // Gambar Kanky Outdoor/Abu
+            }
+        ];
+
+        // 2. FUNGSI MENAMPILKAN PRODUK
+        function tampilkanProduk() {
+            const container = document.getElementById('daftar-produk');
+            let html = '';
+            
+            produkData.forEach(produk => {
+                // Format harga ke Rupiah
+                let hargaRupiah = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(produk.harga);
+
+                html += `
+                <div class="col-md-4 mb-4">
+                    <div class="card card-product h-100">
+                        <!-- Menggunakan onerror agar jika gambar mati, ada placeholder -->
+                        <img src="${produk.gambar}" class="card-img-top" alt="${produk.nama}" 
+                             style="height: 280px; object-fit: cover;"
+                             onerror="this.src='https://via.placeholder.com/400x300?text=Kanky+Shoes'">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title fw-bold">${produk.nama}</h5>
+                            <p class="card-text text-muted small flex-grow-1">${produk.deskripsi}</p>
+                            <h5 class="text-danger mb-3 fw-bold">${hargaRupiah}</h5>
+                            <button class="btn btn-kanky w-100 mt-auto" onclick="bukaHalamanBayar(${produk.id})">
+                                <i class="fas fa-shopping-bag me-2"></i>BELI SEKARANG
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // 3. FUNGSI BUKA HALAMAN TRANSAKSI
+        function bukaHalamanBayar(idProduk) {
+            // Cari data produk berdasarkan ID
+            const produk = produkData.find(p => p.id === idProduk);
+            
+            // Isi detail produk ke form transaksi
+            document.getElementById('nama-preview').innerText = produk.nama;
+            document.getElementById('harga-preview').innerText = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(produk.harga);
+            document.getElementById('img-preview').src = produk.gambar;
+
+            // Pindah tampilan (Sembunyikan Katalog, Munculkan Transaksi)
+            document.getElementById('halaman-katalog').style.display = 'none';
+            document.getElementById('halaman-transaksi').style.display = 'block';
+            
+            // Scroll ke atas
+            window.scrollTo(0, 0);
+        }
+
+        // 4. FUNGSI KEMBALI KE KATALOG
+        function kembaliKeKatalog() {
+            document.getElementById('halaman-transaksi').style.display = 'none';
+            document.getElementById('halaman-katalog').style.display = 'block';
+            document.getElementById('form-bayar').reset();
+        }
+
+        // 5. FUNGSI PROSES PEMBAYARAN (SIMULASI)
+        function prosesBayar(event) {
+            event.preventDefault(); // Mencegah reload halaman
+
+            const nama = document.getElementById('nama_pembeli').value;
+            const barang = document.getElementById('nama-preview').innerText;
+            const metode = document.getElementById('metode_bayar').value;
+
+            // Tampilkan Alert Sukses
+            alert(`✅ PESANAN DITERIMA!\n\nTerima kasih Kak ${nama}.\nSepatu "${barang}" siap dikirim ke alamat Anda.\nPembayaran: ${metode}`);
+
+            // Kembali ke halaman awal
+            kembaliKeKatalog();
+        }
+
+        // Jalankan fungsi tampilkan produk saat halaman dimuat
+        tampilkanProduk();
+    </script>
+
+</body>
+</html>
